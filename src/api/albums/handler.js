@@ -9,4 +9,10 @@ class AlbumHandler {
     this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
     this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
   }
+  async getAlbumsHandler() {}
+  async getAlbumByIdHandler(request, h) {}
+  async postAlbumHandler(request, h) {}
+  async putAlbumByIdHandler(request, h) {}
+  async deleteAlbumByIdHandler(request, h) {}
 }
+module.exports = AlbumHandler;
