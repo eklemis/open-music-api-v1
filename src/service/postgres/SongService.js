@@ -1,6 +1,6 @@
 const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
-const { mapDBAlbumToModel, mapDBSongToModel } = require("../../utils");
+const { mapDBSongToModel } = require("../../utils");
 class SongService {
   constructor() {
     this._pool = new Pool();
