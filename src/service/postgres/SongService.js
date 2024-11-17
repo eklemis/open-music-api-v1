@@ -1,13 +1,13 @@
 const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
-
+const { mapDBAlbumToModel, mapDBSongToModel } = require("../../utils");
 class SongService {
   constructor() {
     this._pool = new Pool();
   }
   async getSongs() {
     const result = await this._pool.query("SELECT * FROM songs");
-    return result.rows;
+    return result.rows.map(mapDBSongToModel);
   }
   async getSongById(id) {
     const query = {
@@ -16,7 +16,7 @@ class SongService {
     };
     const result = await this._pool.query(query);
 
-    return result.rows[0];
+    return result.rows.map(mapDBSongToModel)[0];
   }
   async addSong({ title, year, genre, performer, duration, albumId }) {
     const id = nanoid(16);
