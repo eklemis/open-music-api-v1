@@ -43,13 +43,13 @@ class SongService {
   async changeSong(id, { title, year, genre, performer, duration, albumId }) {
     const updatedAt = new Date().toISOString();
     const query = {
-      text: "UPDATE songs SET title = $1, year = $2, genre = $3, performer=$4, duration=$5, updated_at=$6, updated_at = $7 WHERE id = $8 RETURNING id",
+      text: "UPDATE songs SET title = $1, year = $2, genre = $3, performer=$4, duration=$5, album_id=$6, updated_at = $7 WHERE id = $8 RETURNING id",
       values: [title, year, genre, performer, duration, albumId, updatedAt, id],
     };
 
     const result = await this._pool.query(query);
     if (!result.rows.length) {
-      throw new Error("Gagal memperbarui catatan. Id tidak ditemukan");
+      throw new Error("Gagal memperbarui lagu. Id tidak ditemukan");
     }
   }
   async deleteSongById(id) {
