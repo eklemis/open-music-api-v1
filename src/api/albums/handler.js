@@ -46,7 +46,7 @@ class AlbumHandler {
   async putAlbumByIdHandler(request, h) {
     const { id } = request.params;
 
-    await this._service.editAlbumById(id, request.payload);
+    await this._service.changeAlbumById(id, request.payload);
 
     return {
       status: "success",
