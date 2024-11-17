@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
+const { mapDBAlbumToModel } = require("../../utils");
 
 class AlbumService {
   constructor() {
@@ -7,7 +8,7 @@ class AlbumService {
   }
   async getAlbums() {
     const result = await this._pool.query("SELECT * FROM albums");
-    return result.rows;
+    return result.rows.map(mapDBAlbumToModel);
   }
   async getAlbumById(id) {
     const query = {
@@ -16,7 +17,7 @@ class AlbumService {
     };
     const result = await this._pool.query(query);
 
-    return result.rows[0];
+    return result.rows.map(mapDBAlbumToModel)[0];
   }
   async addAlbum({ name, year }) {
     const id = nanoid(16);
