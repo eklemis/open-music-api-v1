@@ -2,7 +2,7 @@ const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
 const { mapDBAlbumToModel } = require("../../utils");
 
-class AlbumServices {
+class AlbumsService {
   constructor() {
     this._pool = new Pool();
   }
@@ -56,4 +56,4 @@ class AlbumServices {
     }
   }
 }
-module.exports = AlbumServices;
+module.exports = AlbumsService;

@@ -1,7 +1,7 @@
 const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
 const { mapDBSongToModel } = require("../../utils");
-class SongServices {
+class SongsService {
   constructor() {
     this._pool = new Pool();
   }
@@ -65,4 +65,4 @@ class SongServices {
   }
 }
 
-module.exports = SongServices;
+module.exports = SongsService;
