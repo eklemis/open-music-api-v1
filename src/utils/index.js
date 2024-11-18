@@ -18,26 +18,18 @@ const mapDBAlbumWithSongsToModel = ({
   createdAt: created_at,
   updatedAt: updated_at,
 });
-const mapDBSongToModel = ({
+const mapDBSongToModel = ({ id, title, year, performer, genre, duration }) => ({
   id,
   title,
   year,
-  genre,
   performer,
+  genre,
   duration,
-  album_id,
-  created_at,
-  updated_at,
-}) => ({
+});
+const mapDBSongToShortModel = ({ id, title, performer }) => ({
   id,
   title,
-  year,
-  genre,
   performer,
-  duration,
-  albumId: album_id,
-  createdAt: created_at,
-  updatedAt: updated_at,
 });
 const mapSong = (row) => ({
   id: row.song_id,
@@ -55,4 +47,9 @@ const mapAlbum = (rows) => {
   };
 };
 
-module.exports = { mapDBAlbumToModel, mapDBSongToModel, mapAlbum };
+module.exports = {
+  mapDBAlbumToModel,
+  mapDBSongToModel,
+  mapDBSongToShortModel,
+  mapAlbum,
+};
