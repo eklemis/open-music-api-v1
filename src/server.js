@@ -27,11 +27,9 @@ const init = async () => {
   server.ext("onPreResponse", (request, h) => {
     // mendapatkan konteks response dari request
     const { response } = request;
-    console.log("response:", response);
 
     // penanganan client error secara internal.
     if (response instanceof ClientError) {
-      console.log("Client error detected:", response);
       const newResponse = h.response({
         status: "fail",
         message: response.message,
