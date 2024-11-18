@@ -30,6 +30,7 @@ class SongHandler {
     };
   }
   async postSongHandler(request, h) {
+    this._validator.validateSongPayload(request.payload);
     const {
       title = "untitled",
       year,
@@ -59,6 +60,7 @@ class SongHandler {
     return response;
   }
   async putSongByIdHandler(request, h) {
+    this._validator.validateSongPayload(request.payload);
     const { id } = request.params;
 
     await this._service.changeSongById(id, request.payload);
