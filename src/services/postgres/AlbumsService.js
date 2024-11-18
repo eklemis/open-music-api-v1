@@ -15,7 +15,16 @@ class AlbumsService {
   }
   async getAlbumById(id) {
     const query = {
-      text: "SELECT * FROM albums WHERE id=$1",
+      text: `SELECT
+                     a.id as album_id,
+                     a.name as album_name,
+                     a.year as album_year,
+                     s.id as song_id,
+                     s.title as song_title,
+                     s.performer
+                   FROM albums a
+                   LEFT JOIN songs s ON s.album_id = a.id
+                   WHERE a.id = $1`,
       values: [id],
     };
     const result = await this._pool.query(query);
@@ -23,7 +32,20 @@ class AlbumsService {
       throw new NotFoundError("Album tidak ditemukan");
     }
 
-    return result.rows.map(mapDBAlbumToModel)[0];
+    const album = {
+      id: result.rows[0].album_id,
+      name: result.rows[0].album_name,
+      year: result.rows[0].album_year,
+      songs: result.rows
+        .filter((row) => row.song_id) // Remove null songs
+        .map((row) => ({
+          id: row.song_id,
+          title: row.song_title,
+          performer: row.performer,
+        })),
+    };
+
+    return album;
   }
   async addAlbum({ name, year }) {
     const id = nanoid(16);
