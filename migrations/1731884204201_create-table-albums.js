@@ -8,6 +8,7 @@ exports.shorthands = undefined;
  * @param run {() => void | undefined}
  * @returns {Promise<void> | void}
  */
+// For albums table
 exports.up = (pgm) => {
   pgm.createTable("albums", {
     id: {
@@ -20,6 +21,14 @@ exports.up = (pgm) => {
     },
     year: {
       type: "SMALLINT",
+      notNull: true,
+    },
+    created_at: {
+      type: "TEXT",
+      notNull: true,
+    },
+    updated_at: {
+      type: "TEXT",
       notNull: true,
     },
   });
