@@ -1,7 +1,14 @@
 class SongHandler {
   constructor(service, validator) {
+    //console.log("Service:", service); // Check if service is defined
     this._service = service;
     this._validator = validator;
+
+    this.getSongsHandler = this.getSongsHandler.bind(this);
+    this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
+    this.postSongHandler = this.postSongHandler.bind(this);
+    this.putSongByIdHandler = this.putSongByIdHandler.bind(this);
+    this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
   }
   async getSongsHandler() {
     const songs = await this._service.getSongs();

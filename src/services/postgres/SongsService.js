@@ -24,14 +24,15 @@ class SongsService {
     const updatedAt = createdAt;
 
     const query = {
-      text: "INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+      text: "INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
       values: [
-        albumId,
+        id,
         title,
         year,
         genre,
         performer,
         duration,
+        albumId,
         createdAt,
         updatedAt,
       ],
