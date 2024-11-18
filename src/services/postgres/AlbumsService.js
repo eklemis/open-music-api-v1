@@ -1,6 +1,6 @@
 const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
-const { mapDBAlbumToModel } = require("../../utils");
+const { mapDBAlbumToModel, mapAlbum } = require("../../utils");
 
 const InvariantError = require("../../exceptions/InvariantError");
 const NotFoundError = require("../../exceptions/NotFoundError");
@@ -32,18 +32,7 @@ class AlbumsService {
       throw new NotFoundError("Album tidak ditemukan");
     }
 
-    const album = {
-      id: result.rows[0].album_id,
-      name: result.rows[0].album_name,
-      year: result.rows[0].album_year,
-      songs: result.rows
-        .filter((row) => row.song_id) // Remove null songs
-        .map((row) => ({
-          id: row.song_id,
-          title: row.song_title,
-          performer: row.performer,
-        })),
-    };
+    const album = mapAlbum(result.rows);
 
     return album;
   }
