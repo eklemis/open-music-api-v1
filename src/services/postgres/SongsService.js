@@ -5,10 +5,35 @@ class SongsService {
   constructor() {
     this._pool = new Pool();
   }
-  async getSongs() {
-    const result = await this._pool.query("SELECT * FROM songs");
+  async getSongs({ title, performer }) {
+    let conditions = [];
+    let values = [];
+
+    // Build conditions based on the presence of query parameters
+    if (title) {
+      conditions.push(`title ILIKE $${conditions.length + 1}`);
+      values.push(`%${title}%`);
+    }
+
+    if (performer) {
+      conditions.push(`performer ILIKE $${conditions.length + 1}`);
+      values.push(`%${performer}%`);
+    }
+
+    // Create the WHERE clause
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    // Prepare and execute the query
+    const query = {
+      text: `SELECT * FROM songs ${whereClause}`,
+      values: values,
+    };
+
+    const result = await this._pool.query(query);
     return result.rows.map(mapDBSongToModel);
   }
+
   async getSongById(id) {
     const query = {
       text: "SELECT * FROM songs WHERE id=$1",
