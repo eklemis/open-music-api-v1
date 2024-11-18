@@ -1,10 +1,10 @@
 require("dotenv").config();
 const Hapi = require("@hapi/hapi");
 const albums = require("./api/albums");
-const AlbumServices = require("./services/postgres/AlbumServices");
+const AlbumsService = require("./services/postgres/AlbumsService");
 
 const init = async () => {
-  const albumServices = new AlbumServices();
+  const albumServices = new AlbumsService();
 
   const server = Hapi.server({
     port: process.env.PORT,
