@@ -19,7 +19,7 @@ const init = async () => {
     },
   });
 
-  await server.register(
+  await server.register([
     {
       plugin: albums,
       options: {
@@ -34,7 +34,7 @@ const init = async () => {
         //validator: NotesValidator,
       },
     },
-  );
+  ]);
 
   await server.start();
   console.log(`Server berjalan pada ${server.info.uri}`);
