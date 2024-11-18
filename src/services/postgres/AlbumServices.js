@@ -8,6 +8,7 @@ class AlbumServices {
   }
   async getAlbums() {
     const result = await this._pool.query("SELECT * FROM albums");
+    console.log("result:", result.rows);
     return result.rows.map(mapDBAlbumToModel);
   }
   async getAlbumById(id) {
@@ -25,7 +26,7 @@ class AlbumServices {
     const updatedAt = createdAt;
 
     const query = {
-      text: "INSERT INTO songs VALUES($1, $2, $3, $4, $5) RETURNING id",
+      text: "INSERT INTO albums VALUES($1, $2, $3, $4, $5) RETURNING id",
       values: [id, name, year, createdAt, updatedAt],
     };
 
@@ -35,7 +36,7 @@ class AlbumServices {
   async changeAlbumById(id, { name, year }) {
     const updatedAt = new Date().toISOString();
     const query = {
-      text: "UPDATE songs SET name = $1, year = $2, updated_at=$3 WHERE id = $4 RETURNING id",
+      text: "UPDATE albums SET name = $1, year = $2, updated_at=$3 WHERE id = $4 RETURNING id",
       values: [name, year, updatedAt, id],
     };
 
