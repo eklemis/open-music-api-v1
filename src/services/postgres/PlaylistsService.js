@@ -7,6 +7,7 @@ const {
 
 const InvariantError = require("../../exceptions/InvariantError");
 const NotFoundError = require("../../exceptions/NotFoundError");
+const AuthorizationError = require("../../exceptions/AuthorizationError");
 
 class PlaylistsService {
   constructor() {
@@ -28,10 +29,10 @@ class PlaylistsService {
     const newPlaylistId = result.rows[0].id;
     return newPlaylistId;
   }
-  async getPlaylists(owner) {
+  async getPlaylists(userId) {
     const query = {
-      text: "select p.*, u.username from playlists p join users u on p.owner=u.id where p.owner=$1",
-      values: [owner],
+      text: "SELECT p.*, u.username FROM playlists p JOIN users u ON p.owner=u.id LEFT JOIN collaborations c ON c.playlist_id=p.id WHERE p.owner=$1 OR c.user_id=$1",
+      values: [userId],
     };
     const queryResult = await this._pool.query(query);
     const mappedData = queryResult.rows.map(mapGetPlayListToModel);
@@ -64,6 +65,22 @@ class PlaylistsService {
       throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
     }
   }
+  async verifyPlaylistAccess(playlistId, userId) {
+    const query = {
+      text: `
+        SELECT 1
+        FROM playlists p
+        LEFT JOIN collaborations c ON c.playlist_id = p.id
+        WHERE p.id = $1 AND (p.owner = $2 OR c.user_id = $2);
+      `,
+      values: [playlistId, userId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
+    }
+  }
+
   async addPlaylistSong({ playlistId, songId }) {
     const id = nanoid(16);
     const query = {
