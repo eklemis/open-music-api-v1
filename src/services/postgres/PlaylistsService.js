@@ -65,6 +65,17 @@ class PlaylistsService {
       throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
     }
   }
+  async verifyPlaylistExists(playlistId) {
+    const query = {
+      text: "SELECT EXISTS(SELECT 1 FROM playlists WHERE id = $1)",
+      values: [playlistId],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rows[0].exists) {
+      throw new NotFoundError("Playlist tidak ditemukan");
+    }
+  }
   async verifyPlaylistAccess(playlistId, userId) {
     const query = {
       text: `

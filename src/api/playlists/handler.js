@@ -148,6 +148,7 @@ class PlaylistsHandler {
       const { id: playlistId } = request.params;
       const { id: credentialId } = request.auth.credentials;
 
+      await this._service.verifyPlaylistExists(playlistId);
       await this._service.verifyPlaylistAccess(playlistId, credentialId);
       const playlist = await this._service.getPlaylistSongsById(playlistId);
       return {
@@ -222,6 +223,7 @@ class PlaylistsHandler {
       const { id: playlistId } = request.params;
       const { id: credentialId } = request.auth.credentials;
 
+      await this._service.verifyPlaylistExists(playlistId);
       await this._service.verifyPlaylistAccess(playlistId, credentialId);
       const playlistActivities =
         await this._activitiesService.getPlaylistActivitiesById(playlistId);
