@@ -46,10 +46,21 @@ const mapAlbum = (rows) => {
     songs: rows.filter((row) => row.song_id).map(mapSong),
   };
 };
-
+const mapGetPlayListToModel = ({ id, name, username }) => ({
+  id,
+  name,
+  username,
+});
+const mapDbPlaylistSongToModel = ({ id, title, performer }) => ({
+  id,
+  title,
+  performer,
+});
 module.exports = {
   mapDBAlbumToModel,
   mapDBSongToModel,
   mapDBSongToShortModel,
   mapAlbum,
+  mapGetPlayListToModel,
+  mapDbPlaylistSongToModel,
 };
