@@ -3,6 +3,9 @@ const Hapi = require("@hapi/hapi");
 const Jwt = require("@hapi/jwt");
 const Inert = require("@hapi/inert");
 
+// config
+const config = require("./utils/config.js");
+
 // albums
 const albums = require("./api/albums");
 const AlbumsService = require("./services/postgres/AlbumsService");
@@ -43,6 +46,12 @@ const ExportsValidator = require("./validator/exports");
 // S3 Storage
 const StorageService = require("./services/S3/StorageService");
 
+// album-likes
+const AlbumLikesService = require("./services/postgres/AlbumLikesService");
+
+// cache
+const CacheService = require("./services/redis/CacheService");
+
 // exceptions
 const ClientError = require("./exceptions/ClientError");
 
@@ -55,10 +64,12 @@ const init = async () => {
   const playlistActivitiesService = new PlaylistActivitiesService();
   const collaborationsService = new CollaborationsService();
   const storageService = new StorageService();
+  const cacheService = new CacheService();
+  const albumLikesService = new AlbumLikesService(cacheService);
 
   const server = Hapi.server({
-    port: process.env.PORT,
-    host: process.env.HOST,
+    port: config.app.port,
+    host: config.app.host,
     routes: {
       cors: {
         origin: ["*"],
@@ -109,12 +120,12 @@ const init = async () => {
   ]);
   // mendefinisikan strategy autentikasi jwt
   server.auth.strategy("songapi_jwt", "jwt", {
-    keys: process.env.ACCESS_TOKEN_KEY,
+    keys: config.token.accessTokenKey,
     verify: {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+      maxAgeSec: config.token.maxAge,
     },
     validate: (artifacts) => ({
       isValid: true,
@@ -130,6 +141,7 @@ const init = async () => {
       options: {
         service: albumsService,
         storageService,
+        likesService: albumLikesService,
         validator: AlbumsValidator,
       },
     },

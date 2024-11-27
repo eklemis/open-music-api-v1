@@ -37,6 +37,27 @@ const routes = (handler) => [
       },
     },
   },
+  {
+    method: "POST",
+    path: "/albums/{id}/likes",
+    handler: handler.postAlbumLikeHandler,
+    options: {
+      auth: "songapi_jwt", // Assuming JWT authentication is enabled
+    },
+  },
+  {
+    method: "DELETE",
+    path: "/albums/{id}/likes",
+    handler: handler.deleteAlbumLikeHandler,
+    options: {
+      auth: "songapi_jwt", // Assuming JWT authentication is enabled
+    },
+  },
+  {
+    method: "GET",
+    path: "/albums/{id}/likes",
+    handler: handler.getAlbumLikesHandler,
+  },
 ];
 
 module.exports = routes;

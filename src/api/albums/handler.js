@@ -1,8 +1,9 @@
 class AlbumsHandler {
-  constructor(service, storageService, validator) {
+  constructor(service, storageService, likesService, validator) {
     this._service = service;
     this._validator = validator;
     this._storageService = storageService;
+    this._likesService = likesService;
 
     this.getAlbumsHandler = this.getAlbumsHandler.bind(this);
     this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
@@ -10,6 +11,9 @@ class AlbumsHandler {
     this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
     this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
     this.postCoverImageHandler = this.postCoverImageHandler.bind(this);
+    this.postAlbumLikeHandler = this.postAlbumLikeHandler.bind(this);
+    this.deleteAlbumLikeHandler = this.deleteAlbumLikeHandler.bind(this);
+    this.getAlbumLikesHandler = this.getAlbumLikesHandler.bind(this);
   }
   async getAlbumsHandler() {
     const albums = await this._service.getAlbums();
@@ -84,6 +88,57 @@ class AlbumsHandler {
       },
     });
     response.code(201);
+    return response;
+  }
+  async postAlbumLikeHandler(request, h) {
+    const { id: albumId } = request.params;
+    const { id: userId } = request.auth.credentials;
+
+    await this._service.verifyAlbumExists(albumId);
+    await this._likesService.ensureAlbumNotLiked(albumId, userId);
+    await this._likesService.likeAlbum(albumId, userId);
+
+    const response = h.response({
+      status: "success",
+      message: "Album berhasil disukai",
+    });
+    response.code(201);
+    return response;
+  }
+  async deleteAlbumLikeHandler(request, h) {
+    const { id: albumId } = request.params;
+    const { id: userId } = request.auth.credentials;
+
+    await this._service.verifyAlbumExists(albumId);
+
+    await this._likesService.unlikeAlbum(albumId, userId);
+
+    return {
+      status: "success",
+      message: "Batal menyukai album berhasil",
+    };
+  }
+  async getAlbumLikesHandler(request, h) {
+    const { id: albumId } = request.params;
+
+    await this._service.verifyAlbumExists(albumId);
+
+    // Get the like count
+    const { isFromCache, numLikes } =
+      await this._likesService.getAlbumLikes(albumId);
+
+    const response = h.response({
+      status: "success",
+      data: {
+        likes: numLikes,
+      },
+    });
+
+    // Add X-Data-Source header based on cache status
+    if (isFromCache) {
+      response.header("X-Data-Source", "cache");
+    }
+
     return response;
   }
 }
