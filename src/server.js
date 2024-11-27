@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Hapi = require("@hapi/hapi");
 const Jwt = require("@hapi/jwt");
+const Inert = require("@hapi/inert");
 
 // albums
 const albums = require("./api/albums");
@@ -34,6 +35,14 @@ const collaborations = require("./api/collaborations");
 const CollaborationsService = require("./services/postgres/CollaborationsService");
 const CollaborationsValidator = require("./validator/collaborations");
 
+// Exports
+const _exports = require("./api/exports");
+const ProducerService = require("./services/rabbitmq/ProducerService");
+const ExportsValidator = require("./validator/exports");
+
+// S3 Storage
+const StorageService = require("./services/S3/StorageService");
+
 // exceptions
 const ClientError = require("./exceptions/ClientError");
 
@@ -45,6 +54,7 @@ const init = async () => {
   const playlistsService = new PlaylistsService();
   const playlistActivitiesService = new PlaylistActivitiesService();
   const collaborationsService = new CollaborationsService();
+  const storageService = new StorageService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -60,22 +70,41 @@ const init = async () => {
     // mendapatkan konteks response dari request
     const { response } = request;
 
-    // penanganan client error secara internal.
-    if (response instanceof ClientError) {
+    if (response instanceof Error) {
+      // penanganan client error secara internal.
+      if (response instanceof ClientError) {
+        const newResponse = h.response({
+          status: "fail",
+          message: response.message,
+        });
+        newResponse.code(response.statusCode);
+        return newResponse;
+      }
+
+      // mempertahankan penanganan client error oleh hapi secara native, seperti 404, etc.
+      if (!response.isServer) {
+        return h.continue;
+      }
+
+      // penanganan server error sesuai kebutuhan
       const newResponse = h.response({
-        status: "fail",
-        message: response.message,
+        status: "error",
+        message: "terjadi kegagalan pada server kami",
       });
-      newResponse.code(response.statusCode);
+      newResponse.code(500);
       return newResponse;
     }
 
+    // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
     return h.continue;
   });
   // registrasi plugin eksternal
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ]);
   // mendefinisikan strategy autentikasi jwt
@@ -100,6 +129,7 @@ const init = async () => {
       plugin: albums,
       options: {
         service: albumsService,
+        storageService,
         validator: AlbumsValidator,
       },
     },
@@ -142,6 +172,14 @@ const init = async () => {
         playlistsService: playlistsService,
         usersService: usersService,
         validator: CollaborationsValidator,
+      },
+    },
+    {
+      plugin: _exports,
+      options: {
+        service: ProducerService,
+        playlistsService: playlistsService,
+        validator: ExportsValidator,
       },
     },
   ]);

@@ -43,6 +43,7 @@ const mapAlbum = (rows) => {
     id: rows[0].album_id,
     name: rows[0].album_name,
     year: rows[0].album_year,
+    coverUrl: rows[0].coverurl || null,
     songs: rows.filter((row) => row.song_id).map(mapSong),
   };
 };

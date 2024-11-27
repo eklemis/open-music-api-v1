@@ -230,7 +230,7 @@ class PlaylistsHandler {
       return {
         status: "success",
         data: {
-          playlistActivities,
+          ...playlistActivities,
         },
       };
     } catch (error) {

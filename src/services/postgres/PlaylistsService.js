@@ -110,8 +110,10 @@ class PlaylistsService {
     };
 
     const queryResult = await this._pool.query(query);
+
     const firstResultRow = queryResult.rows[0];
     const playlistSongs = queryResult.rows.map(mapDbPlaylistSongToModel);
+
     const playlist = {
       id: firstResultRow.playlistid,
       name: firstResultRow.name,
